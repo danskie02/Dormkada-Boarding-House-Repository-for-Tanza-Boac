@@ -1,15 +1,28 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: DormKada API specification
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication operations
+  - name: boarding-houses
+    description: Boarding house listings
+  - name: rooms
+    description: Room management
+  - name: reservations
+    description: Reservation management
+  - name: tenants
+    description: Tenant record management
+  - name: users
+    description: User management
+  - name: admin
+    description: Admin operations
 paths:
   /healthz:
     get:
@@ -24,6 +37,629 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /auth/register:
+    post:
+      operationId: registerUser
+      tags: [auth]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterBody"
+      responses:
+        "201":
+          description: User registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Email already in use
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/login:
+    post:
+      operationId: loginUser
+      tags: [auth]
+      summary: Login user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginBody"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/logout:
+    post:
+      operationId: logoutUser
+      tags: [auth]
+      summary: Logout user
+      responses:
+        "200":
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /auth/me:
+    get:
+      operationId: getCurrentUser
+      tags: [auth]
+      summary: Get current logged-in user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /boarding-houses:
+    get:
+      operationId: listBoardingHouses
+      tags: [boarding-houses]
+      summary: List all approved boarding houses
+      parameters:
+        - name: priceMin
+          in: query
+          schema:
+            type: ["integer", "null"]
+        - name: priceMax
+          in: query
+          schema:
+            type: ["integer", "null"]
+        - name: roomType
+          in: query
+          schema:
+            type: ["string", "null"]
+        - name: search
+          in: query
+          schema:
+            type: ["string", "null"]
+      responses:
+        "200":
+          description: List of approved boarding houses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BoardingHouse"
+    post:
+      operationId: createBoardingHouse
+      tags: [boarding-houses]
+      summary: Create a new boarding house listing (owner only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBoardingHouseBody"
+      responses:
+        "201":
+          description: Created boarding house
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BoardingHouse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /boarding-houses/{id}:
+    get:
+      operationId: getBoardingHouse
+      tags: [boarding-houses]
+      summary: Get a single boarding house by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Boarding house detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BoardingHouseDetail"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      operationId: updateBoardingHouse
+      tags: [boarding-houses]
+      summary: Update a boarding house listing (owner only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateBoardingHouseBody"
+      responses:
+        "200":
+          description: Updated boarding house
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BoardingHouse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteBoardingHouse
+      tags: [boarding-houses]
+      summary: Delete a boarding house listing (owner only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /boarding-houses/my:
+    get:
+      operationId: getMyBoardingHouses
+      tags: [boarding-houses]
+      summary: Get boarding houses owned by current user
+      responses:
+        "200":
+          description: Owner's boarding house listings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BoardingHouse"
+
+  /boarding-houses/{id}/rooms:
+    get:
+      operationId: listRooms
+      tags: [rooms]
+      summary: List rooms for a boarding house
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: type
+          in: query
+          schema:
+            type: ["string", "null"]
+        - name: status
+          in: query
+          schema:
+            type: ["string", "null"]
+      responses:
+        "200":
+          description: List of rooms
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Room"
+    post:
+      operationId: createRoom
+      tags: [rooms]
+      summary: Create a room in a boarding house (owner only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateRoomBody"
+      responses:
+        "201":
+          description: Created room
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Room"
+
+  /rooms/{id}:
+    get:
+      operationId: getRoom
+      tags: [rooms]
+      summary: Get a room by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Room detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Room"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      operationId: updateRoom
+      tags: [rooms]
+      summary: Update a room (owner only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateRoomBody"
+      responses:
+        "200":
+          description: Updated room
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Room"
+    delete:
+      operationId: deleteRoom
+      tags: [rooms]
+      summary: Delete a room (owner only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /reservations:
+    get:
+      operationId: listReservations
+      tags: [reservations]
+      summary: List reservations for current user (student or owner)
+      responses:
+        "200":
+          description: List of reservations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Reservation"
+    post:
+      operationId: createReservation
+      tags: [reservations]
+      summary: Create a new reservation (student only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReservationBody"
+      responses:
+        "201":
+          description: Created reservation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reservation"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /reservations/{id}:
+    get:
+      operationId: getReservation
+      tags: [reservations]
+      summary: Get a reservation by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Reservation detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reservation"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /reservations/{id}/accept:
+    post:
+      operationId: acceptReservation
+      tags: [reservations]
+      summary: Accept a reservation (owner only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Reservation accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reservation"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /reservations/{id}/reject:
+    post:
+      operationId: rejectReservation
+      tags: [reservations]
+      summary: Reject a reservation (owner only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Reservation rejected
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reservation"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /tenants:
+    get:
+      operationId: listTenants
+      tags: [tenants]
+      summary: List tenants for owner's boarding houses
+      responses:
+        "200":
+          description: List of tenants
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Tenant"
+
+  /tenants/{id}/payment:
+    patch:
+      operationId: updateTenantPayment
+      tags: [tenants]
+      summary: Toggle tenant payment status (owner only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePaymentBody"
+      responses:
+        "200":
+          description: Tenant payment status updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tenant"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/pending-owners:
+    get:
+      operationId: listPendingOwners
+      tags: [admin]
+      summary: List owners pending ID verification (admin only)
+      responses:
+        "200":
+          description: List of pending owners
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+
+  /admin/users/{id}/verify:
+    post:
+      operationId: verifyOwner
+      tags: [admin]
+      summary: Verify an owner's ID and activate account (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Owner verified
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/users/{id}/suspend:
+    post:
+      operationId: suspendUser
+      tags: [admin]
+      summary: Suspend a user account (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: User suspended
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /admin/listings:
+    get:
+      operationId: listPendingListings
+      tags: [admin]
+      summary: List all pending boarding house listings for admin review
+      responses:
+        "200":
+          description: Pending listings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BoardingHouse"
+
+  /admin/listings/{id}/approve:
+    post:
+      operationId: approveListing
+      tags: [admin]
+      summary: Approve a boarding house listing (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Listing approved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BoardingHouse"
+
+  /admin/listings/{id}/reject:
+    post:
+      operationId: rejectListing
+      tags: [admin]
+      summary: Reject a boarding house listing (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Listing rejected
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BoardingHouse"
+
+  /stats/summary:
+    get:
+      operationId: getStatsSummary
+      tags: [boarding-houses]
+      summary: Get platform summary stats
+      responses:
+        "200":
+          description: Platform statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StatsSummary"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +670,469 @@ components:
       required:
         - status
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+      required:
+        - success
+
+    RegisterBody:
+      type: object
+      properties:
+        email:
+          type: string
+        fullName:
+          type: string
+        password:
+          type: string
+        role:
+          type: string
+          enum: [student, owner]
+        idImageUrl:
+          type: ["string", "null"]
+      required:
+        - email
+        - fullName
+        - password
+        - role
+
+    LoginBody:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+      required:
+        - email
+        - password
+
+    AuthResponse:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        token:
+          type: string
+      required:
+        - user
+        - token
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+        fullName:
+          type: string
+        role:
+          type: string
+          enum: [student, owner, admin]
+        status:
+          type: string
+          enum: [active, pending, suspended]
+        idImageUrl:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+      required:
+        - id
+        - email
+        - fullName
+        - role
+        - status
+        - createdAt
+
+    BoardingHouse:
+      type: object
+      properties:
+        id:
+          type: integer
+        ownerId:
+          type: integer
+        name:
+          type: string
+        description:
+          type: ["string", "null"]
+        address:
+          type: string
+        barangay:
+          type: string
+        latitude:
+          type: ["number", "null"]
+        longitude:
+          type: ["number", "null"]
+        priceMin:
+          type: integer
+        priceMax:
+          type: integer
+        totalRooms:
+          type: integer
+        availableRooms:
+          type: integer
+        status:
+          type: string
+          enum: [pending, approved, rejected]
+        genderPolicy:
+          type: string
+          enum: [mixed, male_only, female_only]
+        photos:
+          type: array
+          items:
+            type: string
+        amenities:
+          type: array
+          items:
+            type: string
+        rules:
+          type: ["string", "null"]
+        contactEmail:
+          type: ["string", "null"]
+        contactPhone:
+          type: ["string", "null"]
+        socialMediaUrl:
+          type: ["string", "null"]
+        rating:
+          type: ["number", "null"]
+        reviewCount:
+          type: integer
+        ownerName:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+      required:
+        - id
+        - ownerId
+        - name
+        - address
+        - barangay
+        - priceMin
+        - priceMax
+        - totalRooms
+        - availableRooms
+        - status
+        - genderPolicy
+        - photos
+        - amenities
+        - reviewCount
+        - createdAt
+
+    BoardingHouseDetail:
+      allOf:
+        - $ref: "#/components/schemas/BoardingHouse"
+        - type: object
+          properties:
+            rooms:
+              type: array
+              items:
+                $ref: "#/components/schemas/Room"
+          required:
+            - rooms
+
+    CreateBoardingHouseBody:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: ["string", "null"]
+        address:
+          type: string
+        barangay:
+          type: string
+        latitude:
+          type: ["number", "null"]
+        longitude:
+          type: ["number", "null"]
+        priceMin:
+          type: integer
+        priceMax:
+          type: integer
+        genderPolicy:
+          type: string
+          enum: [mixed, male_only, female_only]
+        photos:
+          type: array
+          items:
+            type: string
+        amenities:
+          type: array
+          items:
+            type: string
+        rules:
+          type: ["string", "null"]
+        contactEmail:
+          type: ["string", "null"]
+        contactPhone:
+          type: ["string", "null"]
+        socialMediaUrl:
+          type: ["string", "null"]
+      required:
+        - name
+        - address
+        - barangay
+        - priceMin
+        - priceMax
+        - genderPolicy
+        - photos
+        - amenities
+
+    UpdateBoardingHouseBody:
+      type: object
+      properties:
+        name:
+          type: ["string", "null"]
+        description:
+          type: ["string", "null"]
+        address:
+          type: ["string", "null"]
+        barangay:
+          type: ["string", "null"]
+        latitude:
+          type: ["number", "null"]
+        longitude:
+          type: ["number", "null"]
+        priceMin:
+          type: ["integer", "null"]
+        priceMax:
+          type: ["integer", "null"]
+        genderPolicy:
+          type: ["string", "null"]
+        photos:
+          type: ["array", "null"]
+          items:
+            type: string
+        amenities:
+          type: ["array", "null"]
+          items:
+            type: string
+        rules:
+          type: ["string", "null"]
+        contactEmail:
+          type: ["string", "null"]
+        contactPhone:
+          type: ["string", "null"]
+        socialMediaUrl:
+          type: ["string", "null"]
+
+    Room:
+      type: object
+      properties:
+        id:
+          type: integer
+        boardingHouseId:
+          type: integer
+        name:
+          type: string
+        type:
+          type: string
+          enum: [single, twin, triple, quad, bedspacer_2, bedspacer_3]
+        floor:
+          type: ["integer", "null"]
+        price:
+          type: integer
+        totalSlots:
+          type: integer
+        availableSlots:
+          type: integer
+        status:
+          type: string
+          enum: [available, almost_full, full]
+        amenities:
+          type: array
+          items:
+            type: string
+        photos:
+          type: array
+          items:
+            type: string
+        description:
+          type: ["string", "null"]
+      required:
+        - id
+        - boardingHouseId
+        - name
+        - type
+        - price
+        - totalSlots
+        - availableSlots
+        - status
+        - amenities
+        - photos
+
+    CreateRoomBody:
+      type: object
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+          enum: [single, twin, triple, quad, bedspacer_2, bedspacer_3]
+        floor:
+          type: ["integer", "null"]
+        price:
+          type: integer
+        totalSlots:
+          type: integer
+        amenities:
+          type: array
+          items:
+            type: string
+        photos:
+          type: array
+          items:
+            type: string
+        description:
+          type: ["string", "null"]
+      required:
+        - name
+        - type
+        - price
+        - totalSlots
+        - amenities
+        - photos
+
+    UpdateRoomBody:
+      type: object
+      properties:
+        name:
+          type: ["string", "null"]
+        type:
+          type: ["string", "null"]
+        floor:
+          type: ["integer", "null"]
+        price:
+          type: ["integer", "null"]
+        totalSlots:
+          type: ["integer", "null"]
+        amenities:
+          type: ["array", "null"]
+          items:
+            type: string
+        photos:
+          type: ["array", "null"]
+          items:
+            type: string
+        description:
+          type: ["string", "null"]
+
+    Reservation:
+      type: object
+      properties:
+        id:
+          type: integer
+        studentId:
+          type: integer
+        roomId:
+          type: integer
+        boardingHouseId:
+          type: integer
+        status:
+          type: string
+          enum: [pending, accepted, rejected, expired, cancelled]
+        flagged:
+          type: boolean
+        expiresAt:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        studentName:
+          type: ["string", "null"]
+        roomName:
+          type: ["string", "null"]
+        boardingHouseName:
+          type: ["string", "null"]
+        price:
+          type: ["integer", "null"]
+      required:
+        - id
+        - studentId
+        - roomId
+        - boardingHouseId
+        - status
+        - flagged
+        - createdAt
+        - updatedAt
+
+    CreateReservationBody:
+      type: object
+      properties:
+        roomId:
+          type: integer
+      required:
+        - roomId
+
+    Tenant:
+      type: object
+      properties:
+        id:
+          type: integer
+        studentId:
+          type: integer
+        roomId:
+          type: integer
+        boardingHouseId:
+          type: integer
+        paymentStatus:
+          type: string
+          enum: [paid, unpaid]
+        startDate:
+          type: string
+        studentName:
+          type: ["string", "null"]
+        studentEmail:
+          type: ["string", "null"]
+        roomName:
+          type: ["string", "null"]
+        boardingHouseName:
+          type: ["string", "null"]
+      required:
+        - id
+        - studentId
+        - roomId
+        - boardingHouseId
+        - paymentStatus
+        - startDate
+
+    UpdatePaymentBody:
+      type: object
+      properties:
+        paymentStatus:
+          type: string
+          enum: [paid, unpaid]
+      required:
+        - paymentStatus
+
+    StatsSummary:
+      type: object
+      properties:
+        totalListings:
+          type: integer
+        availableListings:
+          type: integer
+        totalRooms:
+          type: integer
+        availableRooms:
+          type: integer
+        activeReservations:
+          type: integer
+      required:
+        - totalListings
+        - availableListings
+        - totalRooms
+        - availableRooms
+        - activeReservations
