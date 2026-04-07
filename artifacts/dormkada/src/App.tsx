@@ -13,6 +13,9 @@ import OwnerDashboard from "@/pages/owner-dashboard";
 import AdminDashboard from "@/pages/admin-dashboard";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
+import { setAuthTokenGetter } from "@workspace/api-client-react";
+
+setAuthTokenGetter(() => localStorage.getItem("dormkada_token"));
 
 const queryClient = new QueryClient();
 

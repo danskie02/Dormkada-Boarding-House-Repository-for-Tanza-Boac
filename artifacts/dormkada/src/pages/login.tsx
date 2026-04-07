@@ -1,12 +1,11 @@
-import { useState } from "react";
 import { useLocation } from "wouter";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useLoginUser } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
@@ -24,6 +23,7 @@ export default function Login() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const loginUser = useLoginUser();
+  const queryClient = useQueryClient();
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -37,9 +37,10 @@ export default function Login() {
     loginUser.mutate(
       { data },
       {
-        onSuccess: (res) => {
+        onSuccess: async (res) => {
           localStorage.setItem("dormkada_token", res.token);
-          
+          await queryClient.resetQueries();
+
           if (res.user.role === "admin") {
             setLocation("/admin");
           } else if (res.user.role === "owner") {
