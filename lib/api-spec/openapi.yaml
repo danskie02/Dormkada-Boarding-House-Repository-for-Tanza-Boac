@@ -986,6 +986,8 @@ components:
           type: integer
         totalSlots:
           type: integer
+        availableSlots:
+          type: ["integer", "null"]
         amenities:
           type: array
           items:

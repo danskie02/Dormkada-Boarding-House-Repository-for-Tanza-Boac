@@ -29,12 +29,23 @@ export default function Listings() {
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
   const [mapMode, setMapMode] = useState<MapMode>("mini");
 
-  const { data: listings = [], isLoading } = useListBoardingHouses({
+  const { data: listingsData, isLoading } = useListBoardingHouses({
     search: searchTerm || undefined,
     roomType: roomType !== "all" ? roomType : undefined,
     priceMin: priceRange[0],
     priceMax: priceRange[1],
   });
+
+  // The generated client types this as `BoardingHouse[]`, but some backends return
+  // `{ data: BoardingHouse[] }` or other wrappers. Normalize so rendering never crashes.
+  const listings = (() => {
+    if (Array.isArray(listingsData)) return listingsData;
+    const wrapped = listingsData as any;
+    if (Array.isArray(wrapped?.data)) return wrapped.data;
+    if (Array.isArray(wrapped?.items)) return wrapped.items;
+    if (Array.isArray(wrapped?.results)) return wrapped.results;
+    return [];
+  })();
 
   const MapView = (
     <MapContainer
@@ -54,9 +65,13 @@ export default function Listings() {
                 <h3 className="font-bold mb-1">{house.name}</h3>
                 <p className="text-xs text-slate-500 mb-2">{house.address}</p>
                 <p className="font-semibold text-blue-600">₱{house.priceMin}/mo</p>
-                <Link href={`/listings/${house.id}`}>
-                  <Button size="sm" className="w-full mt-2 h-8 text-xs">View Details</Button>
-                </Link>
+                <Button
+                  asChild
+                  size="sm"
+                  className="w-full mt-2 h-8 text-xs text-black bg-blue-300 hover:bgblue-700"
+                >
+                  <Link href={`/listings/${house.id}`}>View Details</Link>
+                </Button>
               </div>
             </Popup>
           </Marker>
@@ -197,8 +212,10 @@ export default function Listings() {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {listings.map((house) => (
-                  <Link key={house.id} href={`/listings/${house.id}`}>
-                    <Card className="overflow-hidden hover:shadow-lg transition-all cursor-pointer border-slate-200 group h-full flex flex-col">
+                  <Card
+                    key={house.id}
+                    className="overflow-hidden hover:shadow-lg transition-all border-slate-200 group h-full flex flex-col"
+                  >
                       <div className="relative h-48 w-full bg-slate-200 overflow-hidden">
                         {house.photos && house.photos.length > 0 ? (
                           <img
@@ -254,13 +271,17 @@ export default function Listings() {
                               ₱{house.priceMin?.toLocaleString()}<span className="text-sm text-slate-500 font-normal">/mo</span>
                             </p>
                           </div>
-                          <Button size="sm" variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-100">
-                            View Details
+                          <Button
+                            asChild
+                            size="sm"
+                            variant="secondary"
+                            className="bg-blue-100 text-black-700 hover:bg-blue-400"
+                          >
+                            <Link href={`/listings/${house.id}`}>View Details</Link>
                           </Button>
                         </div>
                       </CardContent>
-                    </Card>
-                  </Link>
+                  </Card>
                 ))}
               </div>
             )}

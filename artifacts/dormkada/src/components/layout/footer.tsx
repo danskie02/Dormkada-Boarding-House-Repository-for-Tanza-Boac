@@ -28,15 +28,15 @@ export function Footer() {
           <h4 className="font-semibold text-white mb-4">For Landlords</h4>
           <ul className="flex flex-col gap-2 text-sm">
             <li><Link href="/register" className="hover:text-amber-400 transition-colors">List Your Property</Link></li>
-            <li><Link href="/login" className="hover:text-amber-400 transition-colors">Owner Dashboard</Link></li>
+            <li><Link href="/owner" className="hover:text-amber-400 transition-colors">Owner Dashboard</Link></li>
           </ul>
         </div>
 
         <div>
           <h4 className="font-semibold text-white mb-4">Contact</h4>
           <ul className="flex flex-col gap-2 text-sm text-slate-400">
-            <li>Email: support@dormkada.com</li>
-            <li>Phone: +63 900 000 0000</li>
+            <li>Email: dormkada@gmail.com</li>
+            <li>Phone: +639 974 151 127</li>
             <li>Location: Brgy. Tanza, Boac, Marinduque</li>
           </ul>
         </div>

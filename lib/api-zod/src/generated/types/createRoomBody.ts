@@ -14,6 +14,8 @@ export interface CreateRoomBody {
   floor?: number | null;
   price: number;
   totalSlots: number;
+  /** @nullable */
+  availableSlots?: number | null;
   amenities: string[];
   photos: string[];
   /** @nullable */

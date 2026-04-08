@@ -10,20 +10,27 @@ import Listings from "@/pages/listings";
 import ListingDetail from "@/pages/listing-detail";
 import Dashboard from "@/pages/dashboard";
 import OwnerDashboard from "@/pages/owner-dashboard";
+import AddListing from "@/pages/add-listing";
+import RoomManagement from "@/pages/room-management";
 import AdminDashboard from "@/pages/admin-dashboard";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { setAuthTokenGetter } from "@workspace/api-client-react";
+import About from "@/pages/about";
 
 setAuthTokenGetter(() => localStorage.getItem("dormkada_token"));
 
 const queryClient = new QueryClient();
 
 function Router() {
+  const baseFromEnv = import.meta.env.BASE_URL;
+  // Wouter's `base` should be omitted for local "/" deployments.
+  const wouterBase = baseFromEnv && baseFromEnv !== "/" ? baseFromEnv : undefined;
+
   return (
     <div className="flex flex-col min-h-[100dvh]">
       <Navbar />
-      <main className="flex-1">
+      <main className="flex-1 mt-16">
         <Switch>
           <Route path="/" component={Home} />
           <Route path="/login" component={Login} />
@@ -32,7 +39,10 @@ function Router() {
           <Route path="/listings/:id" component={ListingDetail} />
           <Route path="/dashboard" component={Dashboard} />
           <Route path="/owner" component={OwnerDashboard} />
+          <Route path="/owner/add-listing" component={AddListing} />
+          <Route path="/owner/rooms/:boardingHouseId" component={RoomManagement} />
           <Route path="/admin" component={AdminDashboard} />
+          <Route path="/about" component={About} />
           <Route component={NotFound} />
         </Switch>
       </main>
@@ -42,10 +52,14 @@ function Router() {
 }
 
 function App() {
+  const baseFromEnv = import.meta.env.BASE_URL;
+  // Wouter's `base` should be omitted for local "/" deployments.
+  const wouterBase = baseFromEnv && baseFromEnv !== "/" ? baseFromEnv : undefined;
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+        <WouterRouter base={wouterBase}>
           <Router />
         </WouterRouter>
         <Toaster />

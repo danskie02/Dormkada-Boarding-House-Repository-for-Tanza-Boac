@@ -5,10 +5,17 @@
   "type": "module",
   "scripts": {
     "hello": "tsx ./src/hello.ts",
+    "seed": "tsx ./src/seed.ts",
+    "test-db": "tsx ./src/test-db.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {
     "@types/node": "catalog:",
+    "@types/pg": "^8.18.0",
+    "@workspace/db": "workspace:*",
+    "dotenv": "^16.6.1",
+    "drizzle-orm": "catalog:",
+    "pg": "^8.20.0",
     "tsx": "catalog:"
   }
 }

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { 
   useGetStatsSummary,
@@ -14,13 +15,17 @@ import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Loader2, CheckCircle, XCircle, Ban, ExternalLink, ShieldAlert } from "lucide-react";
+import { Loader2, CheckCircle, XCircle, Ban, ExternalLink, ShieldAlert, Eye } from "lucide-react";
 import { Redirect } from "wouter";
+import BoardingHouseReviewModal from "@/components/BoardingHouseReviewModal";
 
 export default function AdminDashboard() {
   const { user, isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [selectedListingId, setSelectedListingId] = useState<number | null>(null);
 
   const { data: stats, isLoading: isStatsLoading } = useGetStatsSummary();
   const { data: pendingOwners = [], isLoading: isOwnersLoading, refetch: refetchOwners } = useListPendingOwners();
@@ -196,6 +201,17 @@ export default function AdminDashboard() {
                       <p className="text-xs font-medium text-slate-600 mt-1">Owner: {listing.ownerName || `ID: ${listing.ownerId}`}</p>
                     </div>
                     <div className="flex gap-2">
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="border-blue-200 text-blue-600 hover:bg-blue-50"
+                        onClick={() => {
+                          setSelectedListingId(listing.id);
+                          setReviewModalOpen(true);
+                        }}
+                      >
+                        <Eye className="h-4 w-4 mr-1" /> View Details
+                      </Button>
                       <Button size="sm" variant="outline" className="border-red-200 text-red-600 hover:bg-red-50" onClick={() => handleRejectListing(listing.id)}>
                         <XCircle className="h-4 w-4 mr-1" /> Reject
                       </Button>
@@ -210,6 +226,18 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {selectedListingId && (
+        <BoardingHouseReviewModal
+          open={reviewModalOpen}
+          onOpenChange={setReviewModalOpen}
+          listingId={selectedListingId}
+          onApprove={handleApproveListing}
+          onReject={handleRejectListing}
+          isApproving={approveListing.isPending}
+          isRejecting={rejectListing.isPending}
+        />
+      )}
     </div>
   );
 }

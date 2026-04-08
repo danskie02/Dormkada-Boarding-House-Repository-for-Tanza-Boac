@@ -10,7 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useLoginUser } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
-import logoNamePath from "@assets/logo_name_1775521822255.jpg";
+import logoNamePath from "@assets/logo_name2.jpg";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -80,7 +80,7 @@ export default function Login() {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="student@msc.edu.ph" {...field} data-testid="input-email" />
+                      <Input placeholder="student@marsu.edu.ph" {...field} data-testid="input-email" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

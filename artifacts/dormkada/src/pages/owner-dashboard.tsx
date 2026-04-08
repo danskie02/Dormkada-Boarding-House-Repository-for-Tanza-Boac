@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
+import { useLocation } from "wouter";
 import { 
   useGetMyBoardingHouses, 
   useListReservations, 
@@ -25,6 +26,7 @@ export default function OwnerDashboard() {
   const { user, isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [, setLocation] = useLocation();
 
   const { data: listings = [], isLoading: isListingsLoading } = useGetMyBoardingHouses();
   const { data: allReservations = [], isLoading: isResLoading } = useListReservations();
@@ -45,6 +47,14 @@ export default function OwnerDashboard() {
   if (user?.role !== "owner") {
     return <Redirect to="/" />;
   }
+
+  const handleAddListing = () => {
+    setLocation("/owner/add-listing");
+  };
+
+  const handleManageRooms = (boardingHouseId: number) => {
+    setLocation(`/owner/rooms/${boardingHouseId}`);
+  };
 
   const pendingReservations = allReservations.filter(r => r.status === 'pending');
 
@@ -88,9 +98,12 @@ export default function OwnerDashboard() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <h1 className="text-3xl font-bold">Owner Dashboard</h1>
-        <Button className="bg-blue-600 hover:bg-blue-700">
+        <Button 
+          className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto"
+          onClick={handleAddListing}
+        >
           <Plus className="h-4 w-4 mr-2" /> Add Listing
         </Button>
       </div>
@@ -118,7 +131,7 @@ export default function OwnerDashboard() {
                 <Home className="h-12 w-12 text-slate-300 mb-4" />
                 <h3 className="text-lg font-medium text-slate-900">No properties listed</h3>
                 <p className="text-slate-500 mb-4">You haven't added any boarding houses yet.</p>
-                <Button variant="outline">Add Your First Listing</Button>
+                <Button variant="outline" onClick={handleAddListing}>Add Your First Listing</Button>
               </CardContent>
             </Card>
           ) : (
@@ -140,9 +153,16 @@ export default function OwnerDashboard() {
                     <p className="text-sm text-slate-500 flex items-center gap-1 mb-4">
                       <MapPin className="h-3 w-3" /> {house.barangay}
                     </p>
-                    <div className="flex justify-between items-center text-sm border-t pt-3">
+                    <div className="flex flex-col sm:flex-row justify-between sm:items-center text-sm border-t pt-3 gap-3">
                       <span className="text-slate-600">Rooms: {house.totalRooms}</span>
-                      <Button variant="ghost" size="sm" className="text-blue-600 p-0 h-auto">Manage Rooms</Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="text-blue-600 p-0 h-auto w-full sm:w-auto text-left sm:text-right justify-start sm:justify-end hover:bg-transparent hover:text-blue-700"
+                        onClick={() => handleManageRooms(house.id)}
+                      >
+                        Manage Rooms
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>

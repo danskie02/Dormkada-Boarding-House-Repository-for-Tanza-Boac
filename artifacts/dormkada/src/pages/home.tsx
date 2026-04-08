@@ -2,7 +2,7 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useGetStatsSummary } from "@workspace/api-client-react";
-import logoPath from "@assets/logo_1775521822256.jpg";
+import logoPath from "@assets/logo2.jpg";
 import { ShieldCheck, Eye, Users, HomeIcon, Building, ArrowRight } from "lucide-react";
 
 export default function Home() {
@@ -11,7 +11,7 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-slate-900 to-blue-900 text-white overflow-hidden py-20 lg:py-32">
+      <section className="relative bg-gradient-to-br from-slate-600 to-blue-800 text-white overflow-hidden py-20 lg:py-32">
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&q=80')] opacity-10 bg-cover bg-center mix-blend-overlay" />
         
         <div className="container mx-auto px-4 relative z-10">
@@ -25,16 +25,21 @@ export default function Home() {
                 Discover verified, safe, and affordable boarding houses in Brgy. Tanza, Boac. Connecting students with trusted landlords.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
-                <Link href="/register">
-                  <Button size="lg" className="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold border-none">
-                    Get Started
-                  </Button>
-                </Link>
-                <Link href="/listings">
-                  <Button size="lg" variant="outline" className="w-full sm:w-auto bg-transparent border-blue-400 text-blue-100 hover:bg-blue-800 hover:text-white">
-                    Browse Listings
-                  </Button>
-                </Link>
+                <Button
+                  asChild
+                  size="lg"
+                  className="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold border-none"
+                >
+                  <Link href="/register">Get Started</Link>
+                </Button>
+                <Button
+                  asChild
+                  size="lg"
+                  variant="outline"
+                  className="w-full sm:w-auto bg-transparent border-blue-400 text-blue-100 hover:bg-blue-800 hover:text-white"
+                >
+                  <Link href="/listings">Browse Listings</Link>
+                </Button>
               </div>
             </div>
             
@@ -52,25 +57,36 @@ export default function Home() {
       </section>
 
       {/* Stats Bar */}
-      <section className="bg-white border-b py-8">
+      <section className="bg-slate-50 border-b py-12 lg:py-16">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-slate-100">
-            <div className="text-center px-4">
-              <p className="text-4xl font-bold text-blue-600 mb-2">{stats?.totalListings || 0}</p>
-              <p className="text-sm text-slate-500 font-medium uppercase tracking-wider">Total Listings</p>
-            </div>
-            <div className="text-center px-4">
-              <p className="text-4xl font-bold text-amber-500 mb-2">{stats?.availableRooms || 0}</p>
-              <p className="text-sm text-slate-500 font-medium uppercase tracking-wider">Rooms Available</p>
-            </div>
-            <div className="text-center px-4">
-              <p className="text-4xl font-bold text-blue-600 mb-2">{stats?.totalRooms || 0}</p>
-              <p className="text-sm text-slate-500 font-medium uppercase tracking-wider">Total Rooms</p>
-            </div>
-            <div className="text-center px-4">
-              <p className="text-4xl font-bold text-emerald-500 mb-2">100%</p>
-              <p className="text-sm text-slate-500 font-medium uppercase tracking-wider">Verified</p>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+            <Card className="border-2 border-blue-300 shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <CardContent className="p-6 aspect-square flex flex-col items-center justify-center text-center">
+                <p className="text-4xl lg:text-5xl font-extrabold text-blue-600 mb-3">{stats?.totalListings || 0}</p>
+                <p className="text-sm lg:text-base text-slate-600 font-semibold uppercase tracking-wider">Total Listings</p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 border-amber-300 shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <CardContent className="p-6 aspect-square flex flex-col items-center justify-center text-center">
+                <p className="text-4xl lg:text-5xl font-extrabold text-amber-500 mb-3">{stats?.availableRooms || 0}</p>
+                <p className="text-sm lg:text-base text-slate-600 font-semibold uppercase tracking-wider">Rooms Available</p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 border-blue-300 shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <CardContent className="p-6 aspect-square flex flex-col items-center justify-center text-center">
+                <p className="text-4xl lg:text-5xl font-extrabold text-blue-600 mb-3">{stats?.totalRooms || 0}</p>
+                <p className="text-sm lg:text-base text-slate-600 font-semibold uppercase tracking-wider">Total Rooms</p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 border-emerald-300 shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <CardContent className="p-6 aspect-square flex flex-col items-center justify-center text-center">
+                <p className="text-4xl lg:text-5xl font-extrabold text-emerald-500 mb-3">100%</p>
+                <p className="text-sm lg:text-base text-slate-600 font-semibold uppercase tracking-wider">Verified</p>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
@@ -110,7 +126,7 @@ export default function Home() {
                   <Users className="h-8 w-8" />
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-3">Student Community</h3>
-                <p className="text-slate-600">Built specifically for students of MSC. Find dorms near campus and connect with your barkada.</p>
+                <p className="text-slate-600">Built specifically for students of MarSU. Find dorms near campus and connect with your barkada.</p>
               </CardContent>
             </Card>
           </div>
@@ -122,11 +138,15 @@ export default function Home() {
         <div className="container mx-auto px-4 max-w-3xl">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to find your new home?</h2>
           <p className="text-blue-100 mb-10 text-lg">Browse our verified listings and reserve your spot today.</p>
-          <Link href="/listings">
-            <Button size="lg" className="bg-white text-blue-600 hover:bg-slate-100 font-bold px-8 h-14 text-lg border-none shadow-xl">
+          <Button
+            asChild
+            size="lg"
+            className="bg-white text-blue-600 hover:bg-slate-100 font-bold px-8 h-14 text-lg border-none shadow-xl"
+          >
+            <Link href="/listings">
               Start Exploring <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </div>
       </section>
     </div>

@@ -28,7 +28,7 @@ router.post("/boarding-houses/:id/rooms", requireAuth, requireRole("owner", "adm
   const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
   const boardingHouseId = parseInt(raw, 10);
 
-  const { name, type, floor, price, totalSlots, amenities, photos, description } = req.body;
+  const { name, type, floor, price, totalSlots, availableSlots, amenities, photos, description, status } = req.body;
 
   if (!name || !type || price == null || totalSlots == null) {
     res.status(400).json({ error: "Missing required fields" });
@@ -36,6 +36,9 @@ router.post("/boarding-houses/:id/rooms", requireAuth, requireRole("owner", "adm
   }
 
   const slots = Number(totalSlots);
+  const available = availableSlots !== undefined ? Math.min(Number(availableSlots), slots) : slots;
+  const roomStatus = status || "available";
+
   const [room] = await db.insert(roomsTable).values({
     boardingHouseId,
     name,
@@ -43,8 +46,8 @@ router.post("/boarding-houses/:id/rooms", requireAuth, requireRole("owner", "adm
     floor: floor ?? null,
     price: Number(price),
     totalSlots: slots,
-    availableSlots: slots,
-    status: "available",
+    availableSlots: available,
+    status: roomStatus,
     amenities: amenities || [],
     photos: photos || [],
     description: description ?? null,
@@ -83,7 +86,7 @@ router.patch("/rooms/:id", requireAuth, requireRole("owner", "admin"), async (re
   const id = parseInt(raw, 10);
 
   const updateData: Record<string, unknown> = {};
-  const fields = ["name", "type", "floor", "price", "totalSlots", "amenities", "photos", "description"];
+  const fields = ["name", "type", "floor", "price", "totalSlots", "availableSlots", "status", "amenities", "photos", "description"];
   for (const field of fields) {
     if (req.body[field] !== undefined) {
       updateData[field] = req.body[field];
@@ -91,12 +94,19 @@ router.patch("/rooms/:id", requireAuth, requireRole("owner", "admin"), async (re
   }
   if (updateData.price) updateData.price = Number(updateData.price);
   if (updateData.totalSlots) updateData.totalSlots = Number(updateData.totalSlots);
+  if (updateData.availableSlots) updateData.availableSlots = Number(updateData.availableSlots);
 
   const [room] = await db.update(roomsTable).set(updateData).where(eq(roomsTable.id, id)).returning();
   if (!room) {
     res.status(404).json({ error: "Room not found" });
     return;
   }
+
+  // Update boarding house room counts
+  const allRooms = await db.select().from(roomsTable).where(eq(roomsTable.boardingHouseId, room.boardingHouseId));
+  const totalRooms = allRooms.length;
+  const availableRooms = allRooms.filter(r => r.status !== "full").length;
+  await db.update(boardingHousesTable).set({ totalRooms, availableRooms }).where(eq(boardingHousesTable.id, room.boardingHouseId));
 
   res.json({ ...room, createdAt: room.createdAt.toISOString(), updatedAt: room.updatedAt.toISOString() });
 });

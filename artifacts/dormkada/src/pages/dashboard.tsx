@@ -54,7 +54,7 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <div className="pt-4 border-t">
-                  <Badge variant="outline" className="bg-slate-50">Student Account</Badge>
+                  <Badge variant="outline" className="bg-slate-50 bg-blue-500 text-white">Student Account</Badge>
                 </div>
               </div>
             </CardContent>

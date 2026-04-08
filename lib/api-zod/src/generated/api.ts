@@ -337,6 +337,7 @@ export const CreateRoomBody = zod.object({
   floor: zod.number().nullish(),
   price: zod.number(),
   totalSlots: zod.number(),
+  availableSlots: zod.number().nullish(),
   amenities: zod.array(zod.string()),
   photos: zod.array(zod.string()),
   description: zod.string().nullish(),

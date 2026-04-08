@@ -2,6 +2,8 @@ import { Router } from "express";
 import { eq, or } from "drizzle-orm";
 import { db, reservationsTable, roomsTable, boardingHousesTable, usersTable, tenantsTable } from "@workspace/db";
 import { requireAuth, requireRole } from "../middlewares/auth";
+import { sendReservationAcceptedEmail, sendReservationRejectedEmail } from "../lib/email-service";
+import { logger } from "../lib/logger";
 
 const router = Router();
 
@@ -58,7 +60,7 @@ router.get("/reservations", requireAuth, async (req, res): Promise<void> => {
         : eq(boardingHousesTable.ownerId, userId)
     );
 
-  // Auto-flag reservations over 24 hours pending
+  // Auto-flag reservations over 24 hours pending (for attention, doesn't expire them)
   const now = new Date();
   const toUpdate: number[] = [];
   for (const r of reservations) {
@@ -166,6 +168,15 @@ router.post("/reservations/:id/accept", requireAuth, requireRole("owner", "admin
     .where(eq(reservationsTable.id, id))
     .returning();
 
+  // Fetch student and room details for email and room update
+  const [studentInfo] = await db
+    .select({
+      email: usersTable.email,
+      fullName: usersTable.fullName,
+    })
+    .from(usersTable)
+    .where(eq(usersTable.id, reservation.studentId));
+
   // Decrement available slots
   const [room] = await db.select().from(roomsTable).where(eq(roomsTable.id, reservation.roomId));
   if (room) {
@@ -186,6 +197,22 @@ router.post("/reservations/:id/accept", requireAuth, requireRole("owner", "admin
       paymentStatus: "unpaid",
       startDate: new Date(),
     });
+
+    // Fetch boarding house name for email
+    const [boardingHouse] = await db
+      .select({ name: boardingHousesTable.name })
+      .from(boardingHousesTable)
+      .where(eq(boardingHousesTable.id, room.boardingHouseId));
+
+    // Send acceptance email asynchronously (don't await to avoid blocking the response)
+    if (studentInfo?.email && studentInfo?.fullName && room?.name && boardingHouse?.name) {
+      sendReservationAcceptedEmail(
+        studentInfo.email,
+        studentInfo.fullName,
+        room.name,
+        boardingHouse.name
+      ).catch(err => logger.error("Failed to send acceptance email:", err));
+    }
   }
 
   res.json(serializeReservation({ ...updated, studentName: null, roomName: null, boardingHouseName: null, price: null }));
@@ -206,6 +233,42 @@ router.post("/reservations/:id/reject", requireAuth, requireRole("owner", "admin
     .set({ status: "rejected" })
     .where(eq(reservationsTable.id, id))
     .returning();
+
+  // Fetch student and room details for email
+  const [studentInfo] = await db
+    .select({
+      email: usersTable.email,
+      fullName: usersTable.fullName,
+    })
+    .from(usersTable)
+    .where(eq(usersTable.id, reservation.studentId));
+
+  // Fetch room and boarding house details
+  const [room] = await db
+    .select({
+      name: roomsTable.name,
+      boardingHouseId: roomsTable.boardingHouseId,
+    })
+    .from(roomsTable)
+    .where(eq(roomsTable.id, reservation.roomId));
+
+  if (room) {
+    const [boardingHouse] = await db
+      .select({ name: boardingHousesTable.name })
+      .from(boardingHousesTable)
+      .where(eq(boardingHousesTable.id, room.boardingHouseId));
+
+    // Send rejection email asynchronously (don't await to avoid blocking the response)
+    if (studentInfo?.email && studentInfo?.fullName && room?.name && boardingHouse?.name) {
+      sendReservationRejectedEmail(
+        studentInfo.email,
+        studentInfo.fullName,
+        room.name,
+        boardingHouse.name,
+        req.body.reason
+      ).catch(err => logger.error("Failed to send rejection email:", err));
+    }
+  }
 
   res.json(serializeReservation({ ...updated, studentName: null, roomName: null, boardingHouseName: null, price: null }));
 });
