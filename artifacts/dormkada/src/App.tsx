@@ -15,8 +15,12 @@ import RoomManagement from "@/pages/room-management";
 import AdminDashboard from "@/pages/admin-dashboard";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
-import { setAuthTokenGetter } from "@workspace/api-client-react";
+import { setAuthTokenGetter, setBaseUrl } from "@workspace/api-client-react";
 import About from "@/pages/about";
+
+// Configure API base URL
+const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+setBaseUrl(apiUrl);
 
 setAuthTokenGetter(() => localStorage.getItem("dormkada_token"));
 
