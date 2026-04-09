@@ -19,12 +19,8 @@ import { setAuthTokenGetter, setBaseUrl } from "@workspace/api-client-react";
 import About from "@/pages/about";
 
 setAuthTokenGetter(() => localStorage.getItem("dormkada_token"));
+setBaseUrl((import.meta.env.VITE_API_URL ?? window.location.origin ?? '').replace(/\/+$/, '') + '/api');
 
-// Only configure explicit API URL for production
-// In local dev, Vite proxy handles /api requests automatically
-if (import.meta.env.VITE_API_URL) {
-  setBaseUrl(import.meta.env.VITE_API_URL);
-}
 
 const queryClient = new QueryClient();
 
