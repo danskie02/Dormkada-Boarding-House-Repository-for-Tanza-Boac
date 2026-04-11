@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import ImageCarousel from "@/components/ImageCarousel";
 import { Loader2, Plus, ChevronLeft, Edit2, Save, X, Upload } from "lucide-react";
 import { Redirect } from "wouter";
 
@@ -517,16 +518,11 @@ export default function RoomManagement() {
               <Card key={room.id} className="overflow-hidden">
                 {/* Room Photos */}
                 {room.photos && room.photos.length > 0 ? (
-                  <div className="h-40 bg-slate-200 relative overflow-x-auto flex">
-                    {room.photos.map((photo: string, index: number) => (
-                      <img
-                        key={index}
-                        src={photo}
-                        alt={`${room.name} - Photo ${index + 1}`}
-                        className="h-40 object-cover flex-shrink-0 w-full"
-                      />
-                    ))}
-                  </div>
+                  <ImageCarousel
+                    images={room.photos}
+                    alt={room.name}
+                    className="h-40 bg-slate-200 w-full"
+                  />
                 ) : (
                   <div className="h-40 bg-slate-200 flex items-center justify-center text-slate-400">
                     No Photos

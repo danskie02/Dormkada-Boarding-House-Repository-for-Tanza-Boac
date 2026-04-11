@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import ImageCarousel from "@/components/ImageCarousel";
 import { MapPin, Star, Phone, Mail, Globe, CheckCircle2, AlertCircle, Home, Users, Loader2 } from "lucide-react";
 
 export default function ListingDetail() {
@@ -151,16 +152,11 @@ export default function ListingDetail() {
           <div className="lg:col-span-2 space-y-8">
             {/* Gallery */}
             {house.photos && house.photos.length > 0 ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                <div className="col-span-2 row-span-2">
-                  <img src={house.photos[0]} alt="Main" className="w-full h-full object-cover rounded-xl aspect-[4/3] md:aspect-video" />
-                </div>
-                {house.photos.slice(1, 3).map((photo, i) => (
-                  <div key={i} className="hidden md:block">
-                    <img src={photo} alt={`Gallery ${i}`} className="w-full h-full object-cover rounded-xl aspect-square" />
-                  </div>
-                ))}
-              </div>
+              <ImageCarousel
+                images={house.photos}
+                alt={house.name}
+                className="w-full h-96 rounded-xl"
+              />
             ) : (
               <div className="w-full aspect-video bg-slate-200 rounded-xl flex items-center justify-center">
                 <Home className="h-16 w-16 text-slate-400" />
@@ -225,7 +221,11 @@ export default function ListingDetail() {
                         <div className="flex flex-col sm:flex-row">
                           <div className="w-full sm:w-48 h-48 sm:h-auto bg-slate-100 shrink-0">
                             {room.photos && room.photos.length > 0 ? (
-                              <img src={room.photos[0]} alt={room.name} className="w-full h-full object-cover" />
+                              <ImageCarousel
+                                images={room.photos}
+                                alt={room.name}
+                                className="w-full h-full"
+                              />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center">
                                 <Home className="h-8 w-8 text-slate-300" />

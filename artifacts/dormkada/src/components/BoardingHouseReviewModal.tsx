@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import ImageCarousel from "@/components/ImageCarousel";
 import {
   MapPin,
   Phone,
@@ -364,17 +365,11 @@ export default function BoardingHouseReviewModal({
               {/* Photos Tab */}
               <TabsContent value="photos" className="space-y-4">
                 {house.photos && house.photos.length > 0 ? (
-                  <div className="grid grid-cols-2 gap-4">
-                    {house.photos.map((photo, index) => (
-                      <div key={index} className="rounded-lg overflow-hidden border border-slate-200">
-                        <img
-                          src={photo}
-                          alt={`Photo ${index + 1}`}
-                          className="w-full h-48 object-cover hover:scale-105 transition-transform"
-                        />
-                      </div>
-                    ))}
-                  </div>
+                  <ImageCarousel
+                    images={house.photos}
+                    alt={house.name}
+                    className="w-full h-96 rounded-lg"
+                  />
                 ) : (
                   <Card>
                     <CardContent className="py-8 text-center">

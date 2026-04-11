@@ -19,6 +19,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import ImageCarousel from "@/components/ImageCarousel";
 import { Loader2, Plus, Home, UserCheck, AlertTriangle, Check, X, MapPin } from "lucide-react";
 import { Redirect } from "wouter";
 
@@ -139,8 +140,12 @@ export default function OwnerDashboard() {
               {listings.map((house) => (
                 <Card key={house.id} className="overflow-hidden">
                   <div className="h-40 bg-slate-200 relative">
-                    {house.photos?.[0] ? (
-                      <img src={house.photos[0]} alt={house.name} className="w-full h-full object-cover" />
+                    {house.photos && house.photos.length > 0 ? (
+                      <ImageCarousel
+                        images={house.photos}
+                        alt={house.name}
+                        className="w-full h-40"
+                      />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-slate-400">No Photo</div>
                     )}

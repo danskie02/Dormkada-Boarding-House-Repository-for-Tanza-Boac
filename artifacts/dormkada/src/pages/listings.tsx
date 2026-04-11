@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { MapPin, Star, Search, Map, X, Maximize2, Minimize2 } from "lucide-react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import ImageCarousel from "@/components/ImageCarousel";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
@@ -218,10 +219,10 @@ export default function Listings() {
                   >
                       <div className="relative h-48 w-full bg-slate-200 overflow-hidden">
                         {house.photos && house.photos.length > 0 ? (
-                          <img
-                            src={house.photos[0]}
+                          <ImageCarousel
+                            images={house.photos}
                             alt={house.name}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            className="w-full h-full"
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center bg-slate-100">

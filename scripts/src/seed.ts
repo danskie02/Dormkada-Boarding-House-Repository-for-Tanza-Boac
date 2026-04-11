@@ -67,9 +67,7 @@ async function main() {
     .values({
       email: "admin@dormkada.sample",
       fullName: "Sample Admin",
-      // NOTE: This is NOT a real hash; use your register endpoint in real usage.
-      // Seeded users are primarily for UI/testing.
-      passwordHash: "seeded",
+      passwordHash: "$2b$10$bHcvaFuFVaNHsX1o4WPi.OYfS4XnqkNjz5HwaPBZmQTGldiMJWxcO", // Dormkada123!
       role: "admin",
       status: "active",
     })
@@ -80,7 +78,7 @@ async function main() {
     .values({
       email: "owner1@dormkada.sample",
       fullName: "Sample Owner One",
-      passwordHash: "seeded",
+      passwordHash: "$2b$10$bHcvaFuFVaNHsX1o4WPi.OYfS4XnqkNjz5HwaPBZmQTGldiMJWxcO", // Dormkada123!
       role: "owner",
       status: "active",
       idImageUrl: "https://example.com/sample-owner-id-1.jpg",
@@ -92,7 +90,7 @@ async function main() {
     .values({
       email: "owner2@dormkada.sample",
       fullName: "Sample Owner Two",
-      passwordHash: "seeded",
+      passwordHash: "$2b$10$bHcvaFuFVaNHsX1o4WPi.OYfS4XnqkNjz5HwaPBZmQTGldiMJWxcO", // Dormkada123!
       role: "owner",
       status: "active",
       idImageUrl: "https://example.com/sample-owner-id-2.jpg",
@@ -104,7 +102,7 @@ async function main() {
     .values({
       email: "student1@dormkada.sample",
       fullName: "Sample Student One",
-      passwordHash: "seeded",
+      passwordHash: "$2b$10$bHcvaFuFVaNHsX1o4WPi.OYfS4XnqkNjz5HwaPBZmQTGldiMJWxcO", // Dormkada123!
       role: "student",
       status: "active",
     })
@@ -115,7 +113,7 @@ async function main() {
     .values({
       email: "student2@dormkada.sample",
       fullName: "Sample Student Two",
-      passwordHash: "seeded",
+      passwordHash: "$2b$10$bHcvaFuFVaNHsX1o4WPi.OYfS4XnqkNjz5HwaPBZmQTGldiMJWxcO", // Dormkada123!
       role: "student",
       status: "active",
     })
