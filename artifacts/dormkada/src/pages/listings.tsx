@@ -211,13 +211,13 @@ export default function Listings() {
                 </Button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 gap-6">
                 {listings.map((house) => (
                   <Card
                     key={house.id}
                     className="overflow-hidden hover:shadow-lg transition-all border-slate-200 group h-full flex flex-col"
                   >
-                      <div className="relative h-48 w-full bg-slate-200 overflow-hidden">
+                      <div className="relative h-64 w-full bg-slate-200 overflow-hidden">
                         {house.photos && house.photos.length > 0 ? (
                           <ImageCarousel
                             images={house.photos}

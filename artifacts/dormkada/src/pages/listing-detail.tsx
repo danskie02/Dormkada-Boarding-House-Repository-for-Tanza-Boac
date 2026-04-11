@@ -219,7 +219,7 @@ export default function ListingDetail() {
                     filteredRooms.map((room) => (
                       <Card key={room.id} className="overflow-hidden border-slate-200">
                         <div className="flex flex-col sm:flex-row">
-                          <div className="w-full sm:w-48 h-48 sm:h-auto bg-slate-100 shrink-0">
+                          <div className="w-full sm:w-96 h-48 sm:h-auto bg-slate-100 shrink-0">
                             {room.photos && room.photos.length > 0 ? (
                               <ImageCarousel
                                 images={room.photos}
@@ -311,11 +311,14 @@ export default function ListingDetail() {
                       </div>
                     )}
                     {house.socialMediaUrl && (
-                      <div className="flex items-center gap-3 text-sm text-slate-600">
-                        <Globe className="h-4 w-4 text-slate-400" />
-                        <a href={house.socialMediaUrl} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
-                          Social Media Page
-                        </a>
+                      <div className="space-y-2">
+                        <p className="text-xs text-slate-500">Tap the link below to message the landlord</p>
+                        <div className="flex items-center gap-3 text-sm text-slate-600">
+                          <Globe className="h-4 w-4 text-slate-400" />
+                          <a href={house.socialMediaUrl} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
+                            Social Media Page
+                          </a>
+                        </div>
                       </div>
                     )}
                   </div>
