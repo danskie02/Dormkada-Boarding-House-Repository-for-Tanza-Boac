@@ -31,6 +31,7 @@ export default function ListingDetail() {
     query: {
       enabled: !!id,
       queryKey: getGetBoardingHouseQueryKey(id),
+      staleTime: 0, // Force fresh fetch every time - ensures up-to-date contact info
     }
   });
 
