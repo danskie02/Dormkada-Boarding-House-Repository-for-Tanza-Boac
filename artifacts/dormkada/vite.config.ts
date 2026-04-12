@@ -52,7 +52,7 @@ export default defineConfig({
     // Proxy API calls to the Express server so the browser can use relative `/api/*` URLs in dev.
     proxy: {
       "/api": {
-        target: process.env.VITE_API_PROXY_TARGET ?? "http://127.0.0.1:3001",
+        target: process.env.API_PROXY_TARGET ?? "http://127.0.0.1:3001",
         changeOrigin: true,
       },
     },
