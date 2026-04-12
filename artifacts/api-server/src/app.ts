@@ -36,6 +36,10 @@ app.get("/debug/env", (req, res) => {
     PORT: process.env.PORT,
     DATABASE_URL: process.env.DATABASE_URL ? "✓ Set" : "✗ Not set",
     DATABASE_URL_PREVIEW: process.env.DATABASE_URL?.substring(0, 50) + "...",
+    SENDGRID_API_KEY: process.env.SENDGRID_API_KEY ? "✓ Set" : "✗ Not set",
+    SENDGRID_FROM_EMAIL: process.env.SENDGRID_FROM_EMAIL || "noreply@dorm-finder.com",
+    SENDGRID_FROM_NAME: process.env.SENDGRID_FROM_NAME || "DormKada",
+    ADMIN_EMAIL: process.env.ADMIN_EMAIL || "✗ Not set",
   });
 });
 
