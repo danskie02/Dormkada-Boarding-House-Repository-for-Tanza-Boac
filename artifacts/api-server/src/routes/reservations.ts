@@ -323,7 +323,7 @@ router.post("/reservations/:id/cancel", requireAuth, requireRole("student"), asy
   const [room] = await db.select().from(roomsTable).where(eq(roomsTable.id, reservation.roomId));
   if (room) {
     const newAvailable = room.availableSlots + 1;
-    const newStatus = newAvailable > 0 ? "available" : "full";
+    const newStatus = newAvailable > 1 ? "available" : newAvailable === 1 ? "almost_full" : "full";
     await db.update(roomsTable).set({ availableSlots: newAvailable, status: newStatus }).where(eq(roomsTable.id, room.id));
 
     // Delete tenant record

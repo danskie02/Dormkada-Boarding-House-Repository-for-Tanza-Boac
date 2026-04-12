@@ -40,12 +40,16 @@ router.post("/auth/register", async (req, res): Promise<void> => {
   }).returning();
 
   // Send admin notification if it's a new owner registration
-  if (role === "owner" && process.env.ADMIN_EMAIL) {
-    sendNewOwnerVerificationEmail(
-      process.env.ADMIN_EMAIL,
-      fullName,
-      email
-    ).catch(err => logger.error("Failed to send owner verification email to admin:", err));
+  if (role === "owner") {
+    if (process.env.ADMIN_EMAIL) {
+      sendNewOwnerVerificationEmail(
+        process.env.ADMIN_EMAIL,
+        fullName,
+        email
+      ).catch(err => logger.error("Failed to send owner verification email to admin:", err));
+    } else {
+      logger.warn("ADMIN_EMAIL not configured - owner verification notification email not sent for new owner registration");
+    }
   }
 
   const token = generateToken({ userId: user.id, role: user.role, email: user.email });

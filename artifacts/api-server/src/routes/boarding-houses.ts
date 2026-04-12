@@ -160,13 +160,17 @@ router.post("/boarding-houses", requireAuth, requireRole("owner"), async (req, r
   const [owner] = await db.select({ fullName: usersTable.fullName }).from(usersTable).where(eq(usersTable.id, req.user!.userId));
 
   // Send admin notification about new pending listing
-  if (process.env.ADMIN_EMAIL && owner) {
-    sendNewPendingListingEmail(
-      process.env.ADMIN_EMAIL,
-      name,
-      owner.fullName,
-      address
-    ).catch(err => logger.error("Failed to send new listing email to admin:", err));
+  if (owner) {
+    if (process.env.ADMIN_EMAIL) {
+      sendNewPendingListingEmail(
+        process.env.ADMIN_EMAIL,
+        name,
+        owner.fullName,
+        address
+      ).catch(err => logger.error("Failed to send new listing email to admin:", err));
+    } else {
+      logger.warn("ADMIN_EMAIL not configured - pending listing notification email not sent to admin");
+    }
   }
 
   res.status(201).json({
