@@ -6,7 +6,7 @@ if (sendGridApiKey) {
   sgMail.setApiKey(sendGridApiKey);
 }
 
-const FROM_EMAIL = process.env.SENDGRID_FROM_EMAIL || "noreply@dorm-finder.com";
+const FROM_EMAIL = process.env.SENDGRID_FROM_EMAIL || "dormkada@gmail.com";
 const FROM_NAME = process.env.SENDGRID_FROM_NAME || "DormKada";
 
 export interface EmailOptions {
