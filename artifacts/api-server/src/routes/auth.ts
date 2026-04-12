@@ -3,6 +3,8 @@ import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
 import { db, usersTable } from "@workspace/db";
 import { generateToken, requireAuth } from "../middlewares/auth";
+import { sendNewOwnerVerificationEmail } from "../lib/email-service";
+import { logger } from "../lib/logger";
 
 const router = Router();
 
@@ -36,6 +38,15 @@ router.post("/auth/register", async (req, res): Promise<void> => {
     status,
     idImageUrl: idImageUrl ?? null,
   }).returning();
+
+  // Send admin notification if it's a new owner registration
+  if (role === "owner" && process.env.ADMIN_EMAIL) {
+    sendNewOwnerVerificationEmail(
+      process.env.ADMIN_EMAIL,
+      fullName,
+      email
+    ).catch(err => logger.error("Failed to send owner verification email to admin:", err));
+  }
 
   const token = generateToken({ userId: user.id, role: user.role, email: user.email });
 

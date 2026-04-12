@@ -2,6 +2,8 @@ import { Router } from "express";
 import { eq, and, gte, lte, sql } from "drizzle-orm";
 import { db, boardingHousesTable, usersTable, roomsTable } from "@workspace/db";
 import { requireAuth, requireRole } from "../middlewares/auth";
+import { sendNewPendingListingEmail } from "../lib/email-service";
+import { logger } from "../lib/logger";
 
 const router = Router();
 
@@ -153,6 +155,19 @@ router.post("/boarding-houses", requireAuth, requireRole("owner"), async (req, r
     socialMediaUrl: socialMediaUrl ?? null,
     status: "pending",
   }).returning();
+
+  // Fetch owner information for admin notification
+  const [owner] = await db.select({ fullName: usersTable.fullName }).from(usersTable).where(eq(usersTable.id, req.user!.userId));
+
+  // Send admin notification about new pending listing
+  if (process.env.ADMIN_EMAIL && owner) {
+    sendNewPendingListingEmail(
+      process.env.ADMIN_EMAIL,
+      name,
+      owner.fullName,
+      address
+    ).catch(err => logger.error("Failed to send new listing email to admin:", err));
+  }
 
   res.status(201).json({
     ...bh,

@@ -10,6 +10,7 @@ export const reservationsTable = pgTable("reservations", {
   status: text("status").notNull().default("pending"), // pending | accepted | rejected | expired | cancelled
   flagged: boolean("flagged").notNull().default(false),
   expiresAt: timestamp("expires_at", { withTimezone: true }),
+  cancellationReason: text("cancellation_reason"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });
