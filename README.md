@@ -1,0 +1,2 @@
+# Dormkada-Boarding-House-Repository-for-Tanza-Boac
+A tri-interface website that serves as a central repository for boarding houses in a certain area. This also manages student's reservations, allows the landowners to manage their tenant accounts and track their payments, while ensuring security and credibility through the admin's interception through validating the landowner's request for listing.
