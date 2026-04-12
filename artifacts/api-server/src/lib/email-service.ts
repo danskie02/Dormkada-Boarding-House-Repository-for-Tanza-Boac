@@ -1,13 +1,19 @@
 import sgMail from "@sendgrid/mail";
+import { logger } from "./logger";
 
 // Initialize SendGrid with API key from environment
 const sendGridApiKey = process.env.SENDGRID_API_KEY;
 if (sendGridApiKey) {
   sgMail.setApiKey(sendGridApiKey);
+  logger.info("✅ SendGrid email service initialized");
+} else {
+  logger.warn("⚠️  SENDGRID_API_KEY not configured - emails will not be sent");
 }
 
 const FROM_EMAIL = process.env.SENDGRID_FROM_EMAIL || "dormkada@gmail.com";
 const FROM_NAME = process.env.SENDGRID_FROM_NAME || "DormKada";
+
+logger.info(`📧 From: ${FROM_NAME} <${FROM_EMAIL}>`);
 
 export interface EmailOptions {
   to: string;
@@ -17,15 +23,28 @@ export interface EmailOptions {
 }
 
 /**
- * Send an email via SendGrid
+ * Send an email via SendGrid with comprehensive logging
  */
 export async function sendEmail(email: EmailOptions): Promise<void> {
   if (!sendGridApiKey) {
-    console.warn("SendGrid API key not configured, skipping email");
+    logger.warn({
+      event: "email_skipped",
+      reason: "SENDGRID_API_KEY not configured",
+      to: email.to,
+      subject: email.subject,
+    }, "📧 Email not sent - SendGrid API key missing");
     return;
   }
 
   try {
+    logger.info({
+      event: "sending_email",
+      to: email.to,
+      subject: email.subject,
+      from: `${FROM_NAME} <${FROM_EMAIL}>`,
+      timestamp: new Date().toISOString(),
+    }, `📤 Sending email to ${email.to}`);
+
     await sgMail.send({
       to: email.to,
       from: {
@@ -36,8 +55,21 @@ export async function sendEmail(email: EmailOptions): Promise<void> {
       html: email.html,
       text: email.text,
     });
+
+    logger.info({
+      event: "email_sent",
+      to: email.to,
+      subject: email.subject,
+      timestamp: new Date().toISOString(),
+    }, `✅ Email sent successfully to ${email.to}`);
   } catch (error) {
-    console.error("Failed to send email:", error);
+    logger.error({
+      event: "email_failed",
+      to: email.to,
+      subject: email.subject,
+      error: error instanceof Error ? error.message : String(error),
+      timestamp: new Date().toISOString(),
+    }, `❌ Failed to send email to ${email.to}`);
     throw error;
   }
 }
@@ -146,6 +178,13 @@ export async function sendReservationAcceptedEmail(
   roomName: string,
   boardingHouseName: string
 ): Promise<void> {
+  logger.info({
+    event: "reservation_accepted_email",
+    studentEmail,
+    studentName,
+    roomName,
+    boardingHouseName,
+  }, `📧 Sending reservation accepted email to student: ${studentName}`);
   const html = generateReservationAcceptedEmail(studentName, roomName, boardingHouseName);
   await sendEmail({
     to: studentEmail,
@@ -164,6 +203,14 @@ export async function sendReservationRejectedEmail(
   boardingHouseName: string,
   reason?: string
 ): Promise<void> {
+  logger.info({
+    event: "reservation_rejected_email",
+    studentEmail,
+    studentName,
+    roomName,
+    boardingHouseName,
+    reason,
+  }, `📧 Sending reservation rejected email to student: ${studentName}`);
   const html = generateReservationRejectedEmail(studentName, roomName, boardingHouseName, reason);
   await sendEmail({
     to: studentEmail,
@@ -181,6 +228,13 @@ export async function sendReservationExpiredEmail(
   roomName: string,
   boardingHouseName: string
 ): Promise<void> {
+  logger.info({
+    event: "reservation_expired_email",
+    studentEmail,
+    studentName,
+    roomName,
+    boardingHouseName,
+  }, `📧 Sending reservation expired email to student: ${studentName}`);
   const html = generateReservationExpiredEmail(studentName, roomName, boardingHouseName);
   await sendEmail({
     to: studentEmail,
@@ -269,6 +323,14 @@ export async function sendNewReservationRequestEmail(
   roomName: string,
   boardingHouseName: string
 ): Promise<void> {
+  logger.info({
+    event: "new_reservation_request_email",
+    ownerEmail,
+    ownerName,
+    studentName,
+    roomName,
+    boardingHouseName,
+  }, `📧 Sending new reservation request email to owner: ${ownerName}`);
   const html = generateNewReservationRequestEmail(ownerName, studentName, roomName, boardingHouseName);
   await sendEmail({
     to: ownerEmail,
@@ -288,6 +350,15 @@ export async function sendReservationCancelledEmail(
   boardingHouseName: string,
   cancellationReason?: string
 ): Promise<void> {
+  logger.info({
+    event: "reservation_cancelled_email",
+    ownerEmail,
+    ownerName,
+    studentName,
+    roomName,
+    boardingHouseName,
+    cancellationReason,
+  }, `📧 Sending reservation cancelled email to owner: ${ownerName}`);
   const html = generateReservationCancelledEmail(ownerName, studentName, roomName, boardingHouseName, cancellationReason);
   await sendEmail({
     to: ownerEmail,
@@ -366,6 +437,12 @@ export async function sendNewOwnerVerificationEmail(
   ownerName: string,
   ownerEmail: string
 ): Promise<void> {
+  logger.info({
+    event: "new_owner_verification_email",
+    adminEmail,
+    ownerName,
+    ownerEmail,
+  }, `📧 Sending new owner verification email to admin`);
   const html = generateNewOwnerVerificationEmail(ownerName, ownerEmail);
   await sendEmail({
     to: adminEmail,
@@ -383,6 +460,13 @@ export async function sendNewPendingListingEmail(
   ownerName: string,
   address: string
 ): Promise<void> {
+  logger.info({
+    event: "new_pending_listing_email",
+    adminEmail,
+    boardingHouseName,
+    ownerName,
+    address,
+  }, `📧 Sending new pending listing email to admin for: ${boardingHouseName}`);
   const html = generateNewPendingListingEmail(boardingHouseName, ownerName, address);
   await sendEmail({
     to: adminEmail,
