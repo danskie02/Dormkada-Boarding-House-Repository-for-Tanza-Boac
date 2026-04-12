@@ -43,6 +43,7 @@ export default function ListingDetail() {
   });
 
   const createReservation = useCreateReservation();
+  const [reservingRoomId, setReservingRoomId] = useState<number | null>(null);
 
   const handleReserve = (roomId: number) => {
     if (!isAuthenticated) {
@@ -54,25 +55,28 @@ export default function ListingDetail() {
       return;
     }
 
+    setReservingRoomId(roomId);
     createReservation.mutate(
       { data: { roomId } },
       {
         onSuccess: () => {
           toast({
-            title: "Reservation Successful",
-            description: "Your reservation request has been sent to the owner.",
+            title: "Reservation sent",
+            description: "Your request was submitted for the room you selected.",
           });
           queryClient.invalidateQueries({ queryKey: getListRoomsQueryKey(id) });
+          setReservingRoomId(null);
           setLocation("/dashboard");
         },
         onError: (err: any) => {
+          setReservingRoomId(null);
           toast({
-            title: "Reservation Failed",
-            description: err.error || "Failed to make a reservation.",
+            title: "Reservation failed",
+            description: err?.message || err?.error || "Could not submit this reservation.",
             variant: "destructive",
           });
-        }
-      }
+        },
+      },
     );
   };
 
@@ -249,10 +253,14 @@ export default function ListingDetail() {
                             
                             <p className="text-slate-600 text-sm mb-4 line-clamp-2">{room.description}</p>
                             
-                            <div className="flex items-center gap-4 text-sm mb-4 bg-slate-50 p-2 rounded">
+                            <div className="flex items-center gap-4 text-sm mb-4 bg-slate-50 p-2 rounded border border-slate-100">
                               <div className="flex items-center gap-1 text-slate-700">
                                 <Users className="h-4 w-4 text-blue-600" />
-                                <span>Capacity: {room.availableSlots} / {room.totalSlots} available</span>
+                                <span>
+                                  <span className="font-medium text-slate-900">{room.name}</span>
+                                  {" — "}
+                                  {room.availableSlots} of {room.totalSlots} slot{room.totalSlots !== 1 ? "s" : ""} open
+                                </span>
                               </div>
                             </div>
 
@@ -261,14 +269,24 @@ export default function ListingDetail() {
                                 <span className="text-2xl font-bold text-blue-600">₱{room.price}</span>
                                 <span className="text-slate-500 text-sm">/month</span>
                               </div>
-                              <Button 
+                              <Button
                                 onClick={() => handleReserve(room.id)}
                                 disabled={room.status === "full" || createReservation.isPending}
-                                className={room.status === "full" ? "bg-slate-300" : "bg-amber-500 hover:bg-amber-600 text-slate-900"}
+                                className={
+                                  room.status === "full"
+                                    ? "bg-slate-300"
+                                    : "bg-amber-500 hover:bg-amber-600 text-slate-900 min-w-[10rem]"
+                                }
                                 data-testid={`button-reserve-${room.id}`}
                               >
-                                {createReservation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                                {room.status === "full" ? "Full" : "Reserve Now"}
+                                {reservingRoomId === room.id && createReservation.isPending ? (
+                                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                                ) : null}
+                                {room.status === "full"
+                                  ? "Full"
+                                  : reservingRoomId === room.id && createReservation.isPending
+                                    ? "Sending…"
+                                    : "Reserve this room"}
                               </Button>
                             </div>
                           </div>
@@ -338,7 +356,7 @@ export default function ListingDetail() {
               <div>
                 <h4 className="font-semibold text-amber-900 text-sm">Reservation Policy</h4>
                 <p className="text-xs text-amber-800 mt-1 leading-relaxed">
-                  Reserving a room sends a request to the owner. You have 24 hours to confirm with payment once accepted, otherwise the reservation expires.
+                  Reserving sends a request to the owner for the specific room you click. The owner will accept or decline; you will see updates on your dashboard.
                 </p>
               </div>
             </div>

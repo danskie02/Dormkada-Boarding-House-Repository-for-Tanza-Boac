@@ -92,9 +92,11 @@ router.patch("/rooms/:id", requireAuth, requireRole("owner", "admin"), async (re
       updateData[field] = req.body[field];
     }
   }
-  if (updateData.price) updateData.price = Number(updateData.price);
-  if (updateData.totalSlots) updateData.totalSlots = Number(updateData.totalSlots);
-  if (updateData.availableSlots) updateData.availableSlots = Number(updateData.availableSlots);
+  if (updateData.price !== undefined) updateData.price = Number(updateData.price);
+  if (updateData.totalSlots !== undefined) updateData.totalSlots = Number(updateData.totalSlots);
+  if (updateData.availableSlots !== undefined) {
+    updateData.availableSlots = Number(updateData.availableSlots);
+  }
 
   const [room] = await db.update(roomsTable).set(updateData).where(eq(roomsTable.id, id)).returning();
   if (!room) {

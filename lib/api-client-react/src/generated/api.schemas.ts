@@ -271,6 +271,10 @@ export interface UpdateRoomBody {
   /** @nullable */
   totalSlots?: number | null;
   /** @nullable */
+  availableSlots?: number | null;
+  /** @nullable */
+  status?: string | null;
+  /** @nullable */
   amenities?: string[] | null;
   /** @nullable */
   photos?: string[] | null;

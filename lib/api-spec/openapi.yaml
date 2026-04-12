@@ -1062,6 +1062,10 @@ components:
           type: ["integer", "null"]
         totalSlots:
           type: ["integer", "null"]
+        availableSlots:
+          type: ["integer", "null"]
+        status:
+          type: ["string", "null"]
         amenities:
           type: ["array", "null"]
           items:

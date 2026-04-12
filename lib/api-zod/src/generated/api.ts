@@ -385,6 +385,8 @@ export const UpdateRoomBody = zod.object({
   floor: zod.number().nullish(),
   price: zod.number().nullish(),
   totalSlots: zod.number().nullish(),
+  availableSlots: zod.number().nullish(),
+  status: zod.string().nullish(),
   amenities: zod.array(zod.string()).nullish(),
   photos: zod.array(zod.string()).nullish(),
   description: zod.string().nullish(),

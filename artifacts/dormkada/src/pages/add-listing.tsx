@@ -10,7 +10,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, ChevronLeft, Save, Trash2, Upload } from "lucide-react";
+import { Loader2, ChevronLeft, Save, Trash2, Upload, Building2 } from "lucide-react";
 import { Redirect } from "wouter";
 
 interface ListingFormData {
@@ -237,31 +237,48 @@ export default function AddListing() {
     { value: "female_only", label: "Female Only" },
   ];
 
+  const fieldClass =
+    "w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/80 focus:border-teal-400 bg-white";
+
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <div className="flex items-center gap-4 mb-8">
+    <div className="min-h-screen bg-gradient-to-b from-teal-50/90 via-cyan-50/40 to-white">
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
         <Button
           variant="ghost"
           size="sm"
-          className="p-0 h-auto text-slate-600 hover:text-slate-900"
+          className="mb-6 text-teal-800 hover:text-teal-950 hover:bg-teal-100/70"
           onClick={() => setLocation("/owner")}
         >
           <ChevronLeft className="h-5 w-5 mr-1" /> Back to Dashboard
         </Button>
-      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl">Add New Boarding House</CardTitle>
-          <p className="text-slate-600 text-sm mt-2">
-            Fill in the details of your boarding house. Your listing will be pending approval.
-          </p>
-        </CardHeader>
+        <div className="rounded-2xl bg-gradient-to-r from-teal-600 via-cyan-600 to-emerald-600 p-6 sm:p-8 text-white shadow-lg mb-8 flex gap-4 items-start">
+          <div className="h-14 w-14 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+            <Building2 className="h-7 w-7" />
+          </div>
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Add a boarding house</h1>
+            <p className="text-teal-100 mt-2 text-sm sm:text-base max-w-2xl">
+              Share your property with students. After you submit, an admin reviews it before it goes live.
+            </p>
+          </div>
+        </div>
 
-        <CardContent className="space-y-6">
+        <Card className="border-teal-200/80 shadow-md overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-teal-50 to-cyan-50 border-b border-teal-100">
+            <CardTitle className="text-xl text-teal-950">Listing details</CardTitle>
+            <p className="text-teal-800/90 text-sm mt-1">
+              Fields marked * are required. You can add individual rooms after this property is created.
+            </p>
+          </CardHeader>
+
+          <CardContent className="space-y-6 pt-6">
           {/* Basic Information Section */}
-          <div className="space-y-4 pb-6 border-b">
-            <h3 className="font-semibold text-slate-900">Basic Information</h3>
+          <div className="space-y-4 pb-6 border-b border-teal-100">
+            <h3 className="font-semibold text-teal-900 flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-teal-500" />
+              Basic information
+            </h3>
 
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
@@ -272,7 +289,7 @@ export default function AddListing() {
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="e.g., Sunshine Boarding House"
-                className="w-full px-4 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-blue-100"
+                className={fieldClass}
               />
             </div>
 
@@ -285,7 +302,7 @@ export default function AddListing() {
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Tell potential tenants about your boarding house..."
                 rows={4}
-                className="w-full px-4 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-blue-100"
+                className={fieldClass}
               />
             </div>
 
@@ -299,7 +316,7 @@ export default function AddListing() {
                   value={formData.address}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                   placeholder="Street address"
-                  className="w-full px-4 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-blue-100"
+                  className={fieldClass}
                 />
               </div>
 
@@ -310,7 +327,7 @@ export default function AddListing() {
                 <select
                   value={formData.barangay}
                   onChange={(e) => setFormData({ ...formData, barangay: e.target.value })}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-blue-100"
+                  className={fieldClass}
                 >
                   {BARANGAYS.map((barangay) => (
                     <option key={barangay} value={barangay}>
@@ -332,7 +349,7 @@ export default function AddListing() {
                   value={formData.latitude}
                   onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
                   placeholder="e.g., 14.5994"
-                  className="w-full px-4 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-blue-100"
+                  className={fieldClass}
                 />
               </div>
 
@@ -346,15 +363,18 @@ export default function AddListing() {
                   value={formData.longitude}
                   onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
                   placeholder="e.g., 120.9842"
-                  className="w-full px-4 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-blue-100"
+                  className={fieldClass}
                 />
               </div>
             </div>
           </div>
 
           {/* Pricing & Rooms Section */}
-          <div className="space-y-4 pb-6 border-b">
-            <h3 className="font-semibold text-slate-900">Pricing & Room Information</h3>
+          <div className="space-y-4 pb-6 border-b border-cyan-100">
+            <h3 className="font-semibold text-cyan-900 flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-cyan-500" />
+              Pricing & rooms
+            </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
@@ -367,7 +387,7 @@ export default function AddListing() {
                   value={formData.priceMin}
                   onChange={(e) => setFormData({ ...formData, priceMin: e.target.value })}
                   placeholder="0"
-                  className="w-full px-4 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-blue-100"
+                  className={fieldClass}
                 />
               </div>
 
@@ -381,7 +401,7 @@ export default function AddListing() {
                   value={formData.priceMax}
                   onChange={(e) => setFormData({ ...formData, priceMax: e.target.value })}
                   placeholder="0"
-                  className="w-full px-4 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-blue-100"
+                  className={fieldClass}
                 />
               </div>
             </div>
@@ -396,7 +416,7 @@ export default function AddListing() {
                 value={formData.totalRooms}
                 onChange={(e) => setFormData({ ...formData, totalRooms: e.target.value })}
                 placeholder="0"
-                className="w-full px-4 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-blue-100"
+                className={fieldClass}
               />
               <p className="text-xs text-slate-500 mt-1">You can manage individual rooms after creating the listing</p>
             </div>
@@ -408,7 +428,7 @@ export default function AddListing() {
               <select
                 value={formData.genderPolicy}
                 onChange={(e) => setFormData({ ...formData, genderPolicy: e.target.value })}
-                className="w-full px-4 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-blue-100"
+                className={fieldClass}
               >
                 {genderPolicies.map((policy) => (
                   <option key={policy.value} value={policy.value}>
@@ -420,11 +440,14 @@ export default function AddListing() {
           </div>
 
           {/* Photos Section */}
-          <div className="space-y-4 pb-6 border-b">
-            <h3 className="font-semibold text-slate-900">Photos</h3>
+          <div className="space-y-4 pb-6 border-b border-emerald-100">
+            <h3 className="font-semibold text-emerald-900 flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-emerald-500" />
+              Photos
+            </h3>
 
             <div className="space-y-3">
-              <div className="border-2 border-dashed border-slate-300 rounded-lg p-4 text-center hover:border-blue-500 transition-colors">
+              <div className="border-2 border-dashed border-teal-300 rounded-lg p-4 text-center bg-teal-50/50 hover:border-teal-500 transition-colors">
                 <Upload className="h-6 w-6 mx-auto text-slate-400 mb-2" />
                 <p className="text-xs text-slate-500 mb-2">Click to upload photos of your boarding house</p>
                 <input
@@ -440,7 +463,7 @@ export default function AddListing() {
                     type="button"
                     variant="outline"
                     size="sm"
-                    className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                    className="text-teal-700 border-teal-300 hover:bg-teal-100"
                     onClick={(e) => {
                       e.preventDefault();
                       document.getElementById("photo-upload")?.click();
@@ -482,8 +505,11 @@ export default function AddListing() {
           </div>
 
           {/* Amenities & Contact Section */}
-          <div className="space-y-4 pb-6 border-b">
-            <h3 className="font-semibold text-slate-900">Amenities & Contact</h3>
+          <div className="space-y-4 pb-6 border-b border-teal-100">
+            <h3 className="font-semibold text-teal-900 flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-teal-600" />
+              Amenities & contact
+            </h3>
 
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
@@ -494,7 +520,7 @@ export default function AddListing() {
                 value={formData.amenities}
                 onChange={(e) => setFormData({ ...formData, amenities: e.target.value })}
                 placeholder="e.g., WiFi, Parking, Laundry, Study Room, Kitchen"
-                className="w-full px-4 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-blue-100"
+                className={fieldClass}
               />
             </div>
 
@@ -508,7 +534,7 @@ export default function AddListing() {
                   value={formData.contactEmail}
                   onChange={(e) => setFormData({ ...formData, contactEmail: e.target.value })}
                   placeholder="contact@example.com"
-                  className="w-full px-4 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-blue-100"
+                  className={fieldClass}
                 />
               </div>
 
@@ -521,7 +547,7 @@ export default function AddListing() {
                   value={formData.contactPhone}
                   onChange={(e) => setFormData({ ...formData, contactPhone: e.target.value })}
                   placeholder="09XX-XXX-XXXX"
-                  className="w-full px-4 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-blue-100"
+                  className={fieldClass}
                 />
               </div>
             </div>
@@ -535,14 +561,17 @@ export default function AddListing() {
                 value={formData.socialMediaUrl}
                 onChange={(e) => setFormData({ ...formData, socialMediaUrl: e.target.value })}
                 placeholder="https://facebook.com/yourbh"
-                className="w-full px-4 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-blue-100"
+                className={fieldClass}
               />
             </div>
           </div>
 
           {/* Rules Section */}
           <div className="space-y-4 pb-6">
-            <h3 className="font-semibold text-slate-900">House Rules</h3>
+            <h3 className="font-semibold text-slate-900 flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-amber-500" />
+              House rules
+            </h3>
 
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
@@ -553,7 +582,7 @@ export default function AddListing() {
                 onChange={(e) => setFormData({ ...formData, rules: e.target.value })}
                 placeholder="List any house rules or policies (e.g., No guests after 10 PM, Quiet hours, etc.)"
                 rows={4}
-                className="w-full px-4 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-blue-100"
+                className={fieldClass}
               />
             </div>
           </div>
@@ -561,7 +590,7 @@ export default function AddListing() {
           {/* Submit Buttons */}
           <div className="flex flex-col sm:flex-row gap-3 pt-4">
             <Button
-              className="bg-blue-600 hover:bg-blue-700 flex-1 sm:flex-initial"
+              className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 flex-1 sm:flex-initial shadow-md"
               onClick={handleSubmit}
               disabled={createBoardingHouse.isPending}
             >
@@ -593,6 +622,7 @@ export default function AddListing() {
           </p>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }
